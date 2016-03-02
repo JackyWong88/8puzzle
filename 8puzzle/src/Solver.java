@@ -1,5 +1,7 @@
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.StdIn;
 
 /*
  * To change this license header, choose License Headers in Project Properties.

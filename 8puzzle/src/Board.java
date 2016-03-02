@@ -9,11 +9,14 @@
  * @author Jacky
  */
 public class Board {
+    private int N;
+    private int[][] blocks;
+    
+    
 // construct a board from an N-by-N array of blocks
 // (where blocks[i][j] = block in row i, column j)
-
     public Board(int[][] blocks) {
-
+        this.blocks = blocks;
     }
 
     public int dimension() {                 // board dimension N
@@ -29,7 +32,13 @@ public class Board {
     }
 
     public boolean isGoal() {                // is this board the goal board?
-        return false;
+        for(int i = 0; i < N; i++) {
+            for(int j = 0; j < N; j++) {
+                if(this.blocks[i][j] != i*N+(j+1) && i != N-1 && j != N-1)
+                    return false;
+            }
+        }
+        return true;
     }
 
     public Board twin() {                   // a board that is obtained by exchanging any pair of blocks
@@ -45,6 +54,12 @@ public class Board {
     }
 
     public String toString() {              // string representation of this board (in the output format specified below)
+        for(int i = 0; i < N; i++) {
+            for(int j = 0; j < N; j++) {
+                if(this.blocks[i][j] != i*N+(j+1) && i != N-1 && j != N-1)
+                    return "none";
+            }
+        }
         return "none";
     }
 

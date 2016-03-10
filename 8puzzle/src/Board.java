@@ -1,24 +1,24 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+import edu.princeton.cs.algs4.Queue;
 /**
  *
  * @author Jacky
  */
 public class Board {
-    private int N;
-    private int[][] blocks;
-    private int moves;
+    private int[][] tiles;
+    private int N, moves, blankcol, blankrow, parentc, parentr;
     
 // construct a board from an N-by-N array of blocks
 // (where blocks[i][j] = block in row i, column j)
     public Board(int[][] blocks) {
+        N = blocks[0].length;
+        N = N*N;
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
-                this.blocks[i][j] = blocks[i][j];
+                if (blocks[i][j] == 0) {
+                    this.blankrow = i;
+                    this.blankcol = j;
+                }
+                this.tiles[i][j] = blocks[i][j];
             }
         }
     }
@@ -31,8 +31,8 @@ public class Board {
         int count = moves;
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
-                if (this.blocks[i][j] == 0) continue;
-                if (this.blocks[i][j] != i*N+(j+1)) count++;
+                if (this.tiles[i][j] == 0) continue;
+                if (this.tiles[i][j] != i*N+(j+1)) count++;
             }
         }
         return count;
@@ -42,8 +42,8 @@ public class Board {
         int count = moves;
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
-                if (this.blocks[i][j] == 0) continue;
-                if (this.blocks[i][j] != i*N+(j+1)) count += Math.abs(i*N+(j+1)-this.blocks[i][j]);
+                if (this.tiles[i][j] == 0) continue;
+                if (this.tiles[i][j] != i*N+(j+1)) count += Math.abs(i*N+(j+1)-this.tiles[i][j]);
             }
         }
         return count;
@@ -52,7 +52,7 @@ public class Board {
     public boolean isGoal() {                // is this board the goal board?
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
-                if(this.blocks[i][j] != i*N+(j+1) && i != N-1 && j != N-1)
+                if(this.tiles[i][j] != i*N+(j+1) && i != N-1 && j != N-1)
                     return false;
             }
         }
@@ -60,14 +60,12 @@ public class Board {
     }
 
     public Board twin() {                   // a board that is obtained by exchanging any pair of blocks
-        int temp1 = this.blocks[0][0];
-        int temp2 = this.blocks[0][1];
-        for(int i = 0; i < N; i++) {
-            for(int j = 0; j < N; j++) {
-                this.blocks[i][j] = blocks[i][j];
-            }
-        }
-        return this;
+        Board twin = new Board(this.tiles);
+        int temp1 = twin.tiles[0][0];
+        int temp2 = twin.tiles[N][N];
+        if (temp1 == 0) temp1 = twin.tiles[0][1];
+        if (temp2 == 0) temp2 = twin.tiles[N][N-1];
+        return twin;
     }
 
     public boolean equals(Object y) {       // does this board equal y?
@@ -77,14 +75,28 @@ public class Board {
         Board that = (Board) y;
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
-                if(this.blocks[i][j] != that.blocks[i][j]) return false;
+                if(this.tiles[i][j] != that.tiles[i][j]) return false;
             }
         }
         return true;
     }
 
     public Iterable<Board> neighbors() {    // all neighboring boards
-
+        Queue neighbors = new Queue();
+        if(this.blankrow != N) neighbors.enqueue(swap(blankrow+1,blankcol));
+        if(this.blankcol != N) neighbors.enqueue(swap(blankrow,blankcol+1));
+        if(this.blankrow != 0) neighbors.enqueue(swap(blankrow-1,blankcol));
+        if(this.blankcol != 0) neighbors.enqueue(swap(blankrow,blankcol-1));
+        return neighbors;
+    }
+    
+    private Board swap(int r, int c) {
+        Board neighbor = new Board(this.tiles);
+        neighbor.parentc = blankcol;
+        neighbor.parentr = blankrow;
+        neighbor.tiles[blankrow][blankcol] = neighbor.tiles[r][c];
+        neighbor.tiles[r][c] = 0;
+        return neighbor;
     }
 
     public String toString() {              // string representation of this board (in the output format specified below)

@@ -83,10 +83,14 @@ public class Board {
 
     public Iterable<Board> neighbors() {    // all neighboring boards
         Queue neighbors = new Queue();
-        if(this.blankrow != N) neighbors.enqueue(swap(blankrow+1,blankcol));
-        if(this.blankcol != N) neighbors.enqueue(swap(blankrow,blankcol+1));
-        if(this.blankrow != 0) neighbors.enqueue(swap(blankrow-1,blankcol));
-        if(this.blankcol != 0) neighbors.enqueue(swap(blankrow,blankcol-1));
+        if(this.blankrow != N && this.parentr != this.blankrow+1 && this.parentc != this.blankcol)
+            neighbors.enqueue(swap(blankrow+1,blankcol));
+        if(this.blankcol != N && this.parentr != this.blankrow && this.parentc != this.blankcol+1)
+            neighbors.enqueue(swap(blankrow,blankcol+1));
+        if(this.blankrow != 0 && this.parentr != this.blankrow-1 && this.parentc != this.blankcol)
+            neighbors.enqueue(swap(blankrow-1,blankcol));
+        if(this.blankcol != 0 && this.parentr != this.blankrow && this.parentc != this.blankcol-1)
+            neighbors.enqueue(swap(blankrow,blankcol-1));
         return neighbors;
     }
     

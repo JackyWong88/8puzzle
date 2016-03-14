@@ -28,7 +28,7 @@ public class Board {
     }
 
     public int hamming() {                   // number of blocks out of place
-        int count = moves;
+        int count = 0;
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
                 if (this.tiles[i][j] == 0) continue;
@@ -39,7 +39,7 @@ public class Board {
     }
 
     public int manhattan() {                // sum of Manhattan distances between blocks and goal
-        int count = moves;
+        int count = 0;
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
                 if (this.tiles[i][j] == 0) continue;

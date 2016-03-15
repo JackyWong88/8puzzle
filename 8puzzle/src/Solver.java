@@ -10,16 +10,19 @@ import edu.princeton.cs.algs4.Stack;
  * @author Jacky
  */
 public class Solver {
-    private Stack solution;
     private int moves = 0;
-
+    private SearchNode solution;
+    
     public Solver(Board initial) {           // find a solution to the initial board (using the A* algorithm)
-        MinPQ original = new MinPQ();
-        
+        MinPQ solver = new MinPQ();
+        MinPQ twinsolver = new MinPQ();
+        Board twin = initial.twin();
+        solver.insert(initial);
+        twinsolver.insert(twin);
     }
 
     public boolean isSolvable() {           // is the initial board solvable?
-        if(moves > 0) return true;
+        if (moves > 0) return true;
         else return false;
     }
 
@@ -28,8 +31,45 @@ public class Solver {
     }
 
     public Iterable<Board> solution() {     // sequence of boards in a shortest solution; null if unsolvable
-        return solution;
+        Stack trace = new Stack();
+        SearchNode current = solution;
+        while (current != null) {
+            trace.push(current.board);
+            current = current.parent;
+        }
+        return trace;
     }
+    
+    private class SearchNode implements Comparable<SearchNode>{
+        int moves;
+        Board board;
+        SearchNode parent;
+
+        public SearchNode(Board board, SearchNode parent) {
+            if (parent == null) moves = 0;
+            else moves = parent.moves + 1;
+            this.board = board;
+            this.parent = parent;
+        }
+
+        @Override
+        public int compareTo(SearchNode node) {
+            int manhattan1 = this.board.manhattan();
+            int manhattan2 = node.board.manhattan();
+            if (this.moves + manhattan1 > node.moves + manhattan2) return 1;
+            else if (this.moves + manhattan1 < node.moves + manhattan2) return -1;
+            else if (manhattan1 > manhattan2) return 1;
+            else if (manhattan1 < manhattan2) return -1;
+            else {
+                int hamming1 = this.board.hamming();
+                int hamming2 = node.board.hamming();
+                if (hamming1 < hamming2) return 1;
+                else if (hamming1 > hamming2) return -1;
+                else return 0;
+            }
+        }
+        
+}   
 
     public static void main(String[] args) {
         // create initial board from file

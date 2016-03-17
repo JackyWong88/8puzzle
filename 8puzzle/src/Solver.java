@@ -4,6 +4,7 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Stack;
+import java.util.Iterator;
 
 /**
  *
@@ -14,11 +15,44 @@ public class Solver {
     private SearchNode solution;
     
     public Solver(Board initial) {           // find a solution to the initial board (using the A* algorithm)
-        MinPQ solver = new MinPQ();
-        MinPQ twinsolver = new MinPQ();
+        SearchNode first = new SearchNode(initial,null);
         Board twin = initial.twin();
-        solver.insert(initial);
-        twinsolver.insert(twin);
+        StdOut.println(twin.toString());
+        SearchNode firstTwin = new SearchNode(twin,null);
+        MinPQ<SearchNode> solver = new MinPQ<SearchNode>();
+        MinPQ<SearchNode> twinsolver = new MinPQ<SearchNode>();
+        solver.insert(first);
+        twinsolver.insert(firstTwin);
+        while(true) {
+            SearchNode current = solver.delMin();
+            SearchNode currentTwin = twinsolver.delMin();
+            if(current.board.isGoal()) {
+                solution = current;
+                StdOut.println(current.board.toString());
+                moves = solution.moves;
+                break;
+            } else if(currentTwin.board.isGoal()) {
+                moves = -1;
+                StdOut.println("unsolvable");
+                break;
+            } else {
+                Iterable<Board> neighbors = current.board.neighbors();
+                Iterator<Board> iterator = neighbors.iterator();
+                while (iterator.hasNext()) {
+                    Board neighbor = iterator.next();
+                    StdOut.print("Inserting ");
+                    StdOut.println(neighbor.toString());
+                    solver.insert(new SearchNode(neighbor,current));
+                }
+                Iterable<Board> twinNeighbors = current.board.neighbors();
+                Iterator<Board> twiniterator = twinNeighbors.iterator();
+                while (twiniterator.hasNext()) {
+                    Board neighbor = twiniterator.next();
+                    twinsolver.insert(new SearchNode(neighbor,currentTwin));
+                }
+            }
+        }
+        //StdOut.println(solution.board.toString());
     }
 
     public boolean isSolvable() {           // is the initial board solvable?

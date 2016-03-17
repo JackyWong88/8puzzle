@@ -28,10 +28,11 @@ public class Solver {
             SearchNode currentTwin = twinsolver.delMin();
             if(current.board.isGoal()) {
                 solution = current;
+                StdOut.print("Solution: ");
                 StdOut.println(current.board.toString());
                 moves = solution.moves;
                 break;
-            } else if(currentTwin.board.isGoal()) {
+            } else if(false) {
                 moves = -1;
                 StdOut.println("unsolvable");
                 break;

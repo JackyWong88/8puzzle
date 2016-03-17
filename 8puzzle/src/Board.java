@@ -112,24 +112,29 @@ public class Board {
         StdOut.print(parentr);
         StdOut.print(",");
         StdOut.println(parentc);
-        if(this.blankrow != N && this.parentr != this.blankrow+1 && this.parentc != this.blankcol)
+        if(this.blankrow != N-1 && this.parentr != this.blankrow+1 && this.parentc != this.blankcol)
             neighbors.push(swap(blankrow+1,blankcol));
-        if(this.blankcol != N && this.parentr != this.blankrow && this.parentc != this.blankcol+1)
+        if(this.blankcol != N-1 && this.parentr != this.blankrow && this.parentc != this.blankcol+1)
             neighbors.push(swap(blankrow,blankcol+1));
         if(this.blankrow != 0 && this.parentr != this.blankrow-1 && this.parentc != this.blankcol)
             neighbors.push(swap(blankrow-1,blankcol));
         if(this.blankcol != 0 && this.parentr != this.blankrow && this.parentc != this.blankcol-1)
             neighbors.push(swap(blankrow,blankcol-1));
-        StdOut.print("neighbors: ");
-        StdOut.println(neighbors.toString());
         return neighbors;
     }
     
+    //swaps the blank space with the given (r, c)
     private Board swap(int r, int c) {
+        StdOut.print("Swapping :");
+        StdOut.print(r);
+        StdOut.print(",");
+        StdOut.println(c);
         Board neighbor = new Board(this.tiles);
-        neighbor.parentc = blankcol;
-        neighbor.parentr = blankrow;
-        neighbor.tiles[blankrow][blankcol] = neighbor.tiles[r][c];
+        neighbor.parentc = this.blankcol;
+        neighbor.parentr = this.blankrow;
+        neighbor.blankcol = c;
+        neighbor.blankrow = r;
+        neighbor.tiles[this.blankrow][this.blankcol] = neighbor.tiles[r][c];
         neighbor.tiles[r][c] = 0;
         return neighbor;
     }

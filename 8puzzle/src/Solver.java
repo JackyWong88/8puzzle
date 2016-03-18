@@ -11,45 +11,46 @@ import java.util.Iterator;
  * @author Jacky
  */
 public class Solver {
-    private int moves = 0;
+
+    private int moves = -2;
     private SearchNode solution;
-    
+
     public Solver(Board initial) {           // find a solution to the initial board (using the A* algorithm)
-        SearchNode first = new SearchNode(initial,null);
+        SearchNode first = new SearchNode(initial, null);
         Board twin = initial.twin();
-        StdOut.println(twin.toString());
-        SearchNode firstTwin = new SearchNode(twin,null);
+        //StdOut.println(twin.toString());
+        SearchNode firstTwin = new SearchNode(twin, null);
         MinPQ<SearchNode> solver = new MinPQ<SearchNode>();
         MinPQ<SearchNode> twinsolver = new MinPQ<SearchNode>();
         solver.insert(first);
         twinsolver.insert(firstTwin);
-        while(true) {
+        while (true) {
             SearchNode current = solver.delMin();
             SearchNode currentTwin = twinsolver.delMin();
-            if(current.board.isGoal()) {
+            if (current.board.isGoal()) {
                 solution = current;
-                StdOut.print("Solution: ");
-                StdOut.println(current.board.toString());
+                //StdOut.print("Solution: ");
+                //StdOut.println(current.board.toString());
                 moves = solution.moves;
                 break;
-            } else if(false) {
+            } else if (currentTwin.board.isGoal()) {
                 moves = -1;
-                StdOut.println("unsolvable");
+                //StdOut.println("unsolvable");
                 break;
             } else {
                 Iterable<Board> neighbors = current.board.neighbors();
                 Iterator<Board> iterator = neighbors.iterator();
                 while (iterator.hasNext()) {
                     Board neighbor = iterator.next();
-                    StdOut.print("Inserting ");
-                    StdOut.println(neighbor.toString());
-                    solver.insert(new SearchNode(neighbor,current));
+                    //StdOut.print("Inserting ");
+                    //StdOut.println(neighbor.toString());
+                    solver.insert(new SearchNode(neighbor, current));
                 }
-                Iterable<Board> twinNeighbors = current.board.neighbors();
+                Iterable<Board> twinNeighbors = currentTwin.board.neighbors();
                 Iterator<Board> twiniterator = twinNeighbors.iterator();
                 while (twiniterator.hasNext()) {
                     Board neighbor = twiniterator.next();
-                    twinsolver.insert(new SearchNode(neighbor,currentTwin));
+                    twinsolver.insert(new SearchNode(neighbor, currentTwin));
                 }
             }
         }
@@ -57,7 +58,7 @@ public class Solver {
     }
 
     public boolean isSolvable() {           // is the initial board solvable?
-        if (moves > 0) return true;
+        if (moves >= 0) return true;
         else return false;
     }
 
@@ -66,7 +67,7 @@ public class Solver {
     }
 
     public Iterable<Board> solution() {     // sequence of boards in a shortest solution; null if unsolvable
-        Stack trace = new Stack();
+        Stack<Board> trace = new Stack<Board>();
         SearchNode current = solution;
         while (current != null) {
             trace.push(current.board);
@@ -74,8 +75,9 @@ public class Solver {
         }
         return trace;
     }
-    
-    private class SearchNode implements Comparable<SearchNode>{
+
+    private class SearchNode implements Comparable<SearchNode> {
+
         int moves;
         Board board;
         SearchNode parent;
@@ -103,8 +105,8 @@ public class Solver {
                 else return 0;
             }
         }
-        
-}   
+
+    }
 
     public static void main(String[] args) {
         // create initial board from file

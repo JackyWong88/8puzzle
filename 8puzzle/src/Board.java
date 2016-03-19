@@ -1,4 +1,5 @@
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
 
@@ -8,21 +9,20 @@ import edu.princeton.cs.algs4.StdOut;
  */
 public class Board {
 
-    private int[][] tiles;
-    private int N, blankcol, blankrow, parentc, parentr;
+    private final int[][] tiles;
+    private final int N; 
+    private int blank, parent;
 
 // construct a board from an N-by-N array of blocks
 // (where blocks[i][j] = block in row i, column j)
     public Board(int[][] blocks) {
-        parentc = -1;
-        parentr = -1;
+        parent = -1;
         N = blocks[0].length;
         this.tiles = new int[N][N];
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 if (blocks[i][j] == 0) {
-                    this.blankrow = i;
-                    this.blankcol = j;
+                    blank = rctoi(i,j);
                 }
                 this.tiles[i][j] = blocks[i][j];
             }
@@ -96,13 +96,21 @@ public class Board {
 
     public boolean equals(Object y) {       // does this board equal y?
         if (y == this) return true;
-        if (y == null) return false;
-        if (y.getClass() != this.getClass()) return false;
+        if (y == null) {
+            return false;
+        }
+        if (y.getClass() != this.getClass()) {
+            return false;
+        }
         Board that = (Board) y;
-        if (this.dimension() != that.dimension()) return false;
+        if (this.dimension() != that.dimension()) {
+            return false;
+        }
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                if (this.tiles[i][j] != that.tiles[i][j]) return false;
+                if (this.tiles[i][j] != that.tiles[i][j]) {
+                    return false;
+                }
             }
         }
         return true;
@@ -118,30 +126,38 @@ public class Board {
 //        StdOut.print(parentr);
 //        StdOut.print(",");
 //        StdOut.println(parentc);
-        if (this.blankrow != N - 1 && this.parentr != this.blankrow + 1 && this.parentc != this.blankcol)
-            neighbors.push(swap(blankrow + 1, blankcol));
-        if (this.blankcol != N - 1 && this.parentr != this.blankrow && this.parentc != this.blankcol + 1)
-            neighbors.push(swap(blankrow, blankcol + 1));
-        if (this.blankrow != 0 && this.parentr != this.blankrow - 1 && this.parentc != this.blankcol)
-            neighbors.push(swap(blankrow - 1, blankcol));
-        if (this.blankcol != 0 && this.parentr != this.blankrow && this.parentc != this.blankcol - 1)
-            neighbors.push(swap(blankrow, blankcol - 1));
+        //if the zero is on the far right
+        if (this.blank % N != 0)
+            neighbors.push(swap(this.blank + 1));
+        if ((this.blank - 1) % N != 0)
+            neighbors.push(swap(this.blank - 1));
+        if (this.blank > N)
+            neighbors.push(swap(this.blank - N));
+        if ((this.blank - 1) / N != N - 1)
+            neighbors.push(swap(this.blank + N));
+        
         return neighbors;
+    }
+    
+    private boolean match(int r1, int c1, int r2, int c2) {
+        return (r1 == r2 && c1 == c2);
+    }
+    
+    private int rctoi(int r, int c) {
+        return r * this.N + (c + 1);
     }
 
     //swaps the blank space with the given (r, c)
-    private Board swap(int r, int c) {
+    private Board swap(int idx) {
 //        StdOut.print("Swapping :");
 //        StdOut.print(r);
 //        StdOut.print(",");
 //        StdOut.println(c);
         Board neighbor = new Board(this.tiles);
-        neighbor.parentc = this.blankcol;
-        neighbor.parentr = this.blankrow;
-        neighbor.blankcol = c;
-        neighbor.blankrow = r;
-        neighbor.tiles[this.blankrow][this.blankcol] = neighbor.tiles[r][c];
-        neighbor.tiles[r][c] = 0;
+        neighbor.parent = this.blank;
+        neighbor.blank = idx;
+        neighbor.tiles[(this.blank - 1)/N][(this.blank + N - 1) % N] = neighbor.tiles[(idx - 1)/N][(idx + N - 1) % N];
+        neighbor.tiles[(idx - 1)/N][(idx + N - 1) % N] = 0;
         return neighbor;
     }
 
@@ -158,6 +174,25 @@ public class Board {
     }
 
     public static void main(String[] args) {// unit tests (not graded)
-
+        // create initial board from file
+        In in = new In(args[0]);
+        int N = in.readInt();
+        int[][] blocks = new int[N][N];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                blocks[i][j] = in.readInt();
+            }
+        }
+        Board initial = new Board(blocks);
+        StdOut.println(initial);
+        for (Board board : initial.neighbors()) {
+            StdOut.println(board);
+            for (Board board2 : board.neighbors()) {
+                StdOut.println(board2);
+                if (board2.equals(initial)) {
+                    StdOut.println("HERE^");
+                }
+            }
+        }
     }
 }

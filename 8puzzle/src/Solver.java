@@ -1,7 +1,6 @@
 
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Stack;
 import java.util.Iterator;
@@ -46,7 +45,13 @@ public class Solver {
                     Board neighbor = iterator.next();
                     //StdOut.print("Inserting ");
                     //StdOut.println(neighbor.toString());
-                    solver.insert(new SearchNode(neighbor, current, current.twin));
+                    if (current.parent == null) {
+                        solver.insert(new SearchNode(neighbor, current, current.twin));
+                        continue;
+                    }
+                    if (!neighbor.equals(current.parent.board)) {
+                        solver.insert(new SearchNode(neighbor, current, current.twin));
+                    }
                 }
             }
         }
@@ -80,7 +85,9 @@ public class Solver {
         private boolean twin;
 
         public SearchNode(Board board, SearchNode parent, boolean twin) {
-            if (parent == null) moves = 0;
+            if (parent == null) {
+                moves = 0;
+            }
             else moves = parent.moves + 1;
             this.board = board;
             this.parent = parent;

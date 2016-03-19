@@ -16,27 +16,29 @@ public class Solver {
     private SearchNode solution;
 
     public Solver(Board initial) {           // find a solution to the initial board (using the A* algorithm)
-        SearchNode first = new SearchNode(initial, null);
+        SearchNode first = new SearchNode(initial, null, false);
         Board twin = initial.twin();
         //StdOut.println(twin.toString());
-        SearchNode firstTwin = new SearchNode(twin, null);
+        SearchNode firstTwin = new SearchNode(twin, null, true);
         MinPQ<SearchNode> solver = new MinPQ<SearchNode>();
-        MinPQ<SearchNode> twinsolver = new MinPQ<SearchNode>();
+//        MinPQ<SearchNode> twinsolver = new MinPQ<SearchNode>();
         solver.insert(first);
-        twinsolver.insert(firstTwin);
+        solver.insert(firstTwin);
         while (true) {
             SearchNode current = solver.delMin();
-            SearchNode currentTwin = twinsolver.delMin();
+//            SearchNode currentTwin = twinsolver.delMin();
             if (current.board.isGoal()) {
-                solution = current;
-                //StdOut.print("Solution: ");
-                //StdOut.println(current.board.toString());
-                moves = solution.moves;
-                break;
-            } else if (currentTwin.board.isGoal()) {
-                moves = -1;
-                //StdOut.println("unsolvable");
-                break;
+                if (current.twin) {
+                    solution = null;
+                    moves = -1;
+                    break;
+                } else {
+                    solution = current;
+                    //StdOut.print("Solution: ");
+                    //StdOut.println(current.board.toString());
+                    moves = solution.moves;
+                    break;
+                }
             } else {
                 Iterable<Board> neighbors = current.board.neighbors();
                 Iterator<Board> iterator = neighbors.iterator();
@@ -44,13 +46,7 @@ public class Solver {
                     Board neighbor = iterator.next();
                     //StdOut.print("Inserting ");
                     //StdOut.println(neighbor.toString());
-                    solver.insert(new SearchNode(neighbor, current));
-                }
-                Iterable<Board> twinNeighbors = currentTwin.board.neighbors();
-                Iterator<Board> twiniterator = twinNeighbors.iterator();
-                while (twiniterator.hasNext()) {
-                    Board neighbor = twiniterator.next();
-                    twinsolver.insert(new SearchNode(neighbor, currentTwin));
+                    solver.insert(new SearchNode(neighbor, current, current.twin));
                 }
             }
         }
@@ -58,8 +54,7 @@ public class Solver {
     }
 
     public boolean isSolvable() {           // is the initial board solvable?
-        if (moves >= 0) return true;
-        else return false;
+        return moves >= 0;
     }
 
     public int moves() {                     // min number of moves to solve initial board; -1 if unsolvable
@@ -67,6 +62,7 @@ public class Solver {
     }
 
     public Iterable<Board> solution() {     // sequence of boards in a shortest solution; null if unsolvable
+        if (solution == null) return null;
         Stack<Board> trace = new Stack<Board>();
         SearchNode current = solution;
         while (current != null) {
@@ -78,15 +74,17 @@ public class Solver {
 
     private class SearchNode implements Comparable<SearchNode> {
 
-        int moves;
-        Board board;
-        SearchNode parent;
+        private int moves;
+        private Board board;
+        private SearchNode parent;
+        private boolean twin;
 
-        public SearchNode(Board board, SearchNode parent) {
+        public SearchNode(Board board, SearchNode parent, boolean twin) {
             if (parent == null) moves = 0;
             else moves = parent.moves + 1;
             this.board = board;
             this.parent = parent;
+            this.twin = twin;
         }
 
         @Override

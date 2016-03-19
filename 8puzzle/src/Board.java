@@ -50,7 +50,8 @@ public class Board {
             for (int j = 0; j < N; j++) {
                 int value = this.tiles[i][j];
                 if (value == 0) continue;
-                if (value != i * N + (j + 1)) count += (Math.abs(value/N - i) + Math.abs(value%N - j - 1));
+                if (value != i * N + (j + 1))
+                    count += (Math.abs((value - 1)/ N - i) + Math.abs((value + N - 1) % N - j));
             }
         }
         return count;
@@ -98,6 +99,7 @@ public class Board {
         if (y == null) return false;
         if (y.getClass() != this.getClass()) return false;
         Board that = (Board) y;
+        if (this.dimension() != that.dimension()) return false;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 if (this.tiles[i][j] != that.tiles[i][j]) return false;

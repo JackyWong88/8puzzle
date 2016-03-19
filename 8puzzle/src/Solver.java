@@ -45,13 +45,7 @@ public class Solver {
                     Board neighbor = iterator.next();
                     //StdOut.print("Inserting ");
                     //StdOut.println(neighbor.toString());
-                    if (current.parent == null) {
-                        solver.insert(new SearchNode(neighbor, current, current.twin));
-                        continue;
-                    }
-                    if (!neighbor.equals(current.parent.board)) {
-                        solver.insert(new SearchNode(neighbor, current, current.twin));
-                    }
+                    solver.insert(new SearchNode(neighbor, current, current.twin));
                 }
             }
         }

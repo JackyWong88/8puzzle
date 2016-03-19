@@ -96,21 +96,13 @@ public class Board {
 
     public boolean equals(Object y) {       // does this board equal y?
         if (y == this) return true;
-        if (y == null) {
-            return false;
-        }
-        if (y.getClass() != this.getClass()) {
-            return false;
-        }
+        if (y == null) return false;
+        if (y.getClass() != this.getClass()) return false;
         Board that = (Board) y;
-        if (this.dimension() != that.dimension()) {
-            return false;
-        }
+        if (this.dimension() != that.dimension()) return false;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                if (this.tiles[i][j] != that.tiles[i][j]) {
-                    return false;
-                }
+                if (this.tiles[i][j] != that.tiles[i][j]) return false;
             }
         }
         return true;
@@ -127,13 +119,13 @@ public class Board {
 //        StdOut.print(",");
 //        StdOut.println(parentc);
         //if the zero is on the far right
-        if (this.blank % N != 0)
+        if (this.blank % N != 0 && this.blank + 1 != this.parent)
             neighbors.push(swap(this.blank + 1));
-        if ((this.blank - 1) % N != 0)
+        if ((this.blank - 1) % N != 0 && this.blank - 1 != this.parent)
             neighbors.push(swap(this.blank - 1));
-        if (this.blank > N)
+        if (this.blank > N && this.blank - N != this.parent)
             neighbors.push(swap(this.blank - N));
-        if ((this.blank - 1) / N != N - 1)
+        if ((this.blank - 1) / N != N - 1 && this.blank + N != this.parent)
             neighbors.push(swap(this.blank + N));
         
         return neighbors;
@@ -189,9 +181,6 @@ public class Board {
             StdOut.println(board);
             for (Board board2 : board.neighbors()) {
                 StdOut.println(board2);
-                if (board2.equals(initial)) {
-                    StdOut.println("HERE^");
-                }
             }
         }
     }
